@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
   phone: String,
   address: String,
   companyInfo: String,
+  CacPublicId: String,
   companyCac: String,
   photo: { type: String, default: "default.jpg" },
   role: {
@@ -33,6 +34,11 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     select: false,
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailConfirmToken: String,
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
@@ -76,6 +82,12 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     return JWTTimestamp < changedTimestamp;
   }
   return false;
+};
+
+userSchema.methods.createEmailConfirmToken = function () {
+  const confirmToken = Math.floor(100000 + Math.random() * 900000);
+  this.emailConfirmToken = confirmToken;
+  return confirmToken;
 };
 
 userSchema.methods.createPasswordResetToken = function () {
