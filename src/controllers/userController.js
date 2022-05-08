@@ -16,7 +16,7 @@ module.exports = {
    */
   signup: catchAsync(async (req, res, next) => {
     let companyCac = null;
-    let CacPublicId = null;
+    let companyCacPublicId = null;
 
     const { email, phone } = req.body;
     const existingUserWithEmail = await User.findOne({ email: email });
@@ -34,7 +34,7 @@ module.exports = {
         }
       );
       companyCac = secure_url;
-      CacPublicId = public_id;
+      companyCacPublicId = public_id;
     }
 
     const newUser = await User.create({
@@ -44,7 +44,7 @@ module.exports = {
       phone: req.body.phone,
       address: req.body.address,
       companyInfo: req.body.companyInfo,
-      CacPublicId: CacPublicId,
+      companyCacPublicId: companyCacPublicId,
       companyCac: companyCac,
       password: req.body.password,
       role: req.body.role,
@@ -73,7 +73,7 @@ module.exports = {
   }),
 
   /**
-   * @function login
+   * @function sendEmail
    * @route /api/user/sendEmail
    * @method POST
    */
@@ -95,6 +95,190 @@ module.exports = {
     res.status(200).json({
       status: "success",
       message: "token sent to mail",
+    });
+  }),
+
+  /**
+   * @function confirmEmail
+   * @route /api/user/confirmEmail
+   * @method POST
+   */
+  confirmEmail: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({
+      emailConfirmToken: req.body.token,
+      email: req.body.email,
+    });
+    if (!user) {
+      return next(new AppError("token is invalid", 400));
+    }
+    user.emailConfirmToken = undefined;
+    await user.save();
+    res.status(200).json({
+      status: "success",
+      message: "Token confirmation successful, you can now login",
+    });
+  }),
+
+  /**
+   * @function updateMe
+   * @route /api/user/updateMe
+   * @method PATCH
+   */
+  updateMe: catchAsync(async (req, res, next) => {
+    if (req.body.password || req.body.passwordConfirm) {
+      next(
+        new AppError(
+          "this route is not for password update, please /updateMyPassword",
+          400
+        )
+      );
+    }
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: "success",
+      data: updatedUser,
+    });
+  }),
+
+  /**
+   * @function updatePhoto
+   * @route /api/user/updatePhoto
+   * @method PATCH
+   */
+  updatePhoto: catchAsync(async (req, res, next) => {
+    if (req.body.password || req.body.passwordConfirm) {
+      next(
+        new AppError(
+          "this route is not for password update, please /updateMyPassword",
+          400
+        )
+      );
+    }
+    if (req.user.photoPublicId)
+      await cloudinary.uploader.destroy(req.user.photoPublicId);
+
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      req.file.path,
+      {
+        upload_preset: "agent",
+      }
+    );
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        photo: secure_url,
+        photoPublic: public_id,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    res.status(200).json({
+      status: "success",
+      data: updatedUser,
+    });
+  }),
+
+  /**
+   * @function forgotPassword
+   * @route /api/user/forgotPassword
+   * @method POST
+   */
+  forgotPassword: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return next(new AppError("There is no user with email address.", 404));
+    }
+
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    const options = {
+      mail: user.email,
+      subject: "Password Reset",
+      email: "../email/forgotPassword.ejs",
+      firtname: user.firstname,
+      token: resetToken,
+    };
+    try {
+      await Mail(options);
+      res.status(200).json({
+        status: "success",
+        message: "Token sent to email!",
+      });
+    } catch (err) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      return next(
+        new AppError("There was an error sending the email. Try again later!"),
+        500
+      );
+    }
+  }),
+
+  /**
+   * @function confirmResetToken
+   * @route /api/user/confirmResetToken
+   * @method POST
+   */
+  confirmResetToken: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({
+      passwordResetToken: req.body.token,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+    if (!user) {
+      return next(new AppError("token is invalid or has expired", 400));
+    }
+    res.status(200).json({
+      status: "success",
+      message: "successful, proceed to reset password",
+      data: user.email,
+    });
+  }),
+
+  /**
+   * @function forgotPassword
+   * @route /api/user/resetPassword
+   * @method PATCH
+   */
+  resetPassword: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({
+      email: req.body.email,
+      passwordResetToken: req.body.token,
+    });
+    if (!user) return next(new AppError("token is invalid", 401));
+
+    user.password = req.body.password;
+    user.passwordResetExpires = undefined;
+    user.passwordResetToken = undefined;
+    await user.save();
+    createAndSendToken(user, 200, res);
+  }),
+
+  /**
+   * @function updatePassword
+   * @route /api/user/updatePassword
+   * @method PATCH
+   */
+  updatePassword: catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select("+password");
+    if (
+      !(await user.correctPassword(req.body.passwordCurrent, user.password))
+    ) {
+      return next(new AppError("your current password is incorrect", 401));
+    }
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    await user.save();
+    res.status(200).json({
+      status: "success",
+      message: "Your password has been updated",
     });
   }),
 };

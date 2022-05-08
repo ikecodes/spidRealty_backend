@@ -20,9 +20,14 @@ const userSchema = new mongoose.Schema({
   phone: String,
   address: String,
   companyInfo: String,
-  CacPublicId: String,
+  companyCacPublicId: String,
   companyCac: String,
-  photo: { type: String, default: "default.jpg" },
+  photoPublicId: String,
+  photo: {
+    type: String,
+    default:
+      "https://res.cloudinary.com/djwxy9aol/image/upload/v1651972394/fuixnwpb8lq78zazftsn.png",
+  },
   role: {
     type: String,
     enum: ["agent", "investor", "buyer", "admin"],
