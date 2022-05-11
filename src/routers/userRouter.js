@@ -10,8 +10,7 @@ router.route("/session").post(UserController.login);
 router.route("/sendEmail").post(UserController.sendEmail);
 router.route("/confirmEmail").post(UserController.confirmEmail);
 router.route("/forgotPassword").post(UserController.forgotPassword);
-router.route("/confirmResetToken").post(UserController.confirmResetToken);
-router.route("/resetPassword").patch(UserController.resetPassword);
+router.route("/resetPassword/:token").patch(UserController.resetPassword);
 
 router.use(auth);
 

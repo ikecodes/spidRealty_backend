@@ -120,6 +120,75 @@ module.exports = {
   }),
 
   /**
+   * @function forgotPassword
+   * @route /api/user/forgotPassword
+   * @method POST
+   */
+  forgotPassword: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return next(new AppError("There is no user with email address.", 404));
+    }
+
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    const resetUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/api/v1/resetPassword/${resetToken}`;
+
+    const options = {
+      mail: user.email,
+      subject: "Password Reset",
+      email: "../email/forgotPassword.ejs",
+      firtname: user.firstname,
+      token: resetUrl,
+    };
+    try {
+      await Mail(options);
+      res.status(200).json({
+        status: "success",
+        message: "Token sent to email!",
+      });
+    } catch (err) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      return next(
+        new AppError("There was an error sending the email. Try again later!"),
+        500
+      );
+    }
+  }),
+
+  /**
+   * @function resetPassword
+   * @route /api/user/resetPassword
+   * @method PATCH
+   */
+  resetPassword: catchAsync(async (req, res, next) => {
+    const hashedPassword = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      passwordResetToken: hashedPassword,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+    //2) set new password id token !expired and user still exists
+    if (!user) {
+      return next(new AppError("token is invalid or has expired", 400));
+    }
+    user.password = req.body.password;
+    user.passwordResetExpires = undefined;
+    user.passwordResetToken = undefined;
+    await user.save();
+
+    createAndSendToken(user, 200, res);
+  }),
+
+  /**
    * @function updateMe
    * @route /api/user/updateMe
    * @method PATCH
@@ -171,7 +240,7 @@ module.exports = {
       req.user._id,
       {
         photo: secure_url,
-        photoPublic: public_id,
+        photoPublicId: public_id,
       },
       {
         new: true,
@@ -183,84 +252,6 @@ module.exports = {
       data: updatedUser,
     });
   }),
-
-  /**
-   * @function forgotPassword
-   * @route /api/user/forgotPassword
-   * @method POST
-   */
-  forgotPassword: catchAsync(async (req, res, next) => {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return next(new AppError("There is no user with email address.", 404));
-    }
-
-    const resetToken = user.createPasswordResetToken();
-    await user.save({ validateBeforeSave: false });
-
-    const options = {
-      mail: user.email,
-      subject: "Password Reset",
-      email: "../email/forgotPassword.ejs",
-      firtname: user.firstname,
-      token: resetToken,
-    };
-    try {
-      await Mail(options);
-      res.status(200).json({
-        status: "success",
-        message: "Token sent to email!",
-      });
-    } catch (err) {
-      user.passwordResetToken = undefined;
-      user.passwordResetExpires = undefined;
-      await user.save({ validateBeforeSave: false });
-      return next(
-        new AppError("There was an error sending the email. Try again later!"),
-        500
-      );
-    }
-  }),
-
-  /**
-   * @function confirmResetToken
-   * @route /api/user/confirmResetToken
-   * @method POST
-   */
-  confirmResetToken: catchAsync(async (req, res, next) => {
-    const user = await User.findOne({
-      passwordResetToken: req.body.token,
-      passwordResetExpires: { $gt: Date.now() },
-    });
-    if (!user) {
-      return next(new AppError("token is invalid or has expired", 400));
-    }
-    res.status(200).json({
-      status: "success",
-      message: "successful, proceed to reset password",
-      data: user.email,
-    });
-  }),
-
-  /**
-   * @function forgotPassword
-   * @route /api/user/resetPassword
-   * @method PATCH
-   */
-  resetPassword: catchAsync(async (req, res, next) => {
-    const user = await User.findOne({
-      email: req.body.email,
-      passwordResetToken: req.body.token,
-    });
-    if (!user) return next(new AppError("token is invalid", 401));
-
-    user.password = req.body.password;
-    user.passwordResetExpires = undefined;
-    user.passwordResetToken = undefined;
-    await user.save();
-    createAndSendToken(user, 200, res);
-  }),
-
   /**
    * @function updatePassword
    * @route /api/user/updatePassword
