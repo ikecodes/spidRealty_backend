@@ -19,7 +19,7 @@ app.use(xss());
 app.use(cors());
 app.use(mongoSanitize());
 
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/users", userRouter);
 
 app.use(errorHandler);
 

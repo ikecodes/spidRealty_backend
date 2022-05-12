@@ -28,6 +28,8 @@ const userSchema = new mongoose.Schema({
     default:
       "https://res.cloudinary.com/djwxy9aol/image/upload/v1651972394/fuixnwpb8lq78zazftsn.png",
   },
+  identityCard: String,
+  identityCardPublicId: String,
   role: {
     type: String,
     enum: ["agent", "investor", "buyer", "admin"],
@@ -43,6 +45,26 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  totalListings: {
+    type: Number,
+    default: 0,
+  },
+  visibleListings: {
+    type: Number,
+    default: 0,
+  },
+  posted: {
+    type: Number,
+    default: 0,
+  },
+  sold: {
+    type: Number,
+    default: 0,
+  },
+  propertyPromotions: {
+    type: Number,
+    default: 0,
+  },
   emailConfirmToken: String,
   passwordChangedAt: Date,
   passwordResetToken: String,
@@ -50,7 +72,7 @@ const userSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true,
-    select: false,
+    // select: false,
   },
 });
 
@@ -66,10 +88,10 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-userSchema.pre(/^find/, function (next) {
-  this.find({ active: { $ne: false } });
-  next();
-});
+// userSchema.pre(/^find/, function (next) {
+//   this.find({ active: { $ne: false } });
+//   next();
+// });
 
 userSchema.methods.correctPassword = async function (
   candidatePassword,

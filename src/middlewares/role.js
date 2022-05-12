@@ -1,4 +1,5 @@
-const restrictTo = (...roles) => {
+const AppError = require("../helpers/appError");
+const role = (...roles) => {
   return (req, res, next) => {
     //roles is an array ['admin', 'lead-guide']
     if (!roles.includes(req.user.role)) {
@@ -11,4 +12,4 @@ const restrictTo = (...roles) => {
   };
 };
 
-module.exports = restrictTo;
+module.exports = role;
