@@ -2,79 +2,82 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, "Please tell us your first name"],
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: [true, "Please tell us your first name"],
+    },
+    lastName: {
+      type: String,
+      require: [true, "Please tell us your last name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide your email"],
+      unique: true,
+      lowercase: true,
+    },
+    phone: String,
+    address: String,
+    companyInfo: String,
+    companyCacPublicId: String,
+    companyCac: String,
+    photoPublicId: String,
+    photo: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/djwxy9aol/image/upload/v1651972394/fuixnwpb8lq78zazftsn.png",
+    },
+    identityCard: String,
+    identityCardPublicId: String,
+    role: {
+      type: String,
+      enum: ["agent", "investor", "buyer", "admin"],
+      default: "agent",
+    },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: 8,
+      select: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    totalListings: {
+      type: Number,
+      default: 0,
+    },
+    visibleListings: {
+      type: Number,
+      default: 0,
+    },
+    posted: {
+      type: Number,
+      default: 0,
+    },
+    sold: {
+      type: Number,
+      default: 0,
+    },
+    propertyPromotions: {
+      type: Number,
+      default: 0,
+    },
+    emailConfirmToken: String,
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      // select: false,
+    },
   },
-  lastName: {
-    type: String,
-    require: [true, "Please tell us your last name"],
-  },
-  email: {
-    type: String,
-    required: [true, "Please provide your email"],
-    unique: true,
-    lowercase: true,
-  },
-  phone: String,
-  address: String,
-  companyInfo: String,
-  companyCacPublicId: String,
-  companyCac: String,
-  photoPublicId: String,
-  photo: {
-    type: String,
-    default:
-      "https://res.cloudinary.com/djwxy9aol/image/upload/v1651972394/fuixnwpb8lq78zazftsn.png",
-  },
-  identityCard: String,
-  identityCardPublicId: String,
-  role: {
-    type: String,
-    enum: ["agent", "investor", "buyer", "admin"],
-    default: "agent",
-  },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    minlength: 8,
-    select: false,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-  totalListings: {
-    type: Number,
-    default: 0,
-  },
-  visibleListings: {
-    type: Number,
-    default: 0,
-  },
-  posted: {
-    type: Number,
-    default: 0,
-  },
-  sold: {
-    type: Number,
-    default: 0,
-  },
-  propertyPromotions: {
-    type: Number,
-    default: 0,
-  },
-  emailConfirmToken: String,
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
-  active: {
-    type: Boolean,
-    default: true,
-    // select: false,
-  },
-});
+  { timestamps: true }
+);
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

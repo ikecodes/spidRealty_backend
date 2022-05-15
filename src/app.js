@@ -6,6 +6,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 
 const errorHandler = require("./middlewares/errorHandler");
 const userRouter = require("./routers/userRouter");
+const propertyRouter = require("./routers/propertyRouter");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(mongoSanitize());
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/properties", propertyRouter);
 
 app.use(errorHandler);
 
