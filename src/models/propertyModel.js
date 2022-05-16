@@ -11,9 +11,9 @@ const propertySchema = new mongoose.Schema(
     size: Number,
     state: String,
     town: String,
-    street: String,
+    address: String,
     price: Number,
-    description: Number,
+    description: String,
     specialFeatures: Array,
     furnished: Boolean,
     newlyBuilt: Boolean,
@@ -25,6 +25,10 @@ const propertySchema = new mongoose.Schema(
       },
     ],
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isSold: {
       type: Boolean,
       default: false,
     },
