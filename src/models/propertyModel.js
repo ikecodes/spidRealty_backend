@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
-
+const slugify = require("slugify");
 const propertySchema = new mongoose.Schema(
   {
     title: String,
+    slug: String,
     type: String,
     category: String,
     bathrooms: Number,
@@ -42,6 +43,10 @@ const propertySchema = new mongoose.Schema(
   }
 );
 
+propertySchema.pre("save", function (next) {
+  this.slug = slugify(this.title, { lower: true });
+  next();
+});
 const Property = mongoose.model("Property", propertySchema);
 
 module.exports = Property;

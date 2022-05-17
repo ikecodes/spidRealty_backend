@@ -2,6 +2,7 @@ const Property = require("../models/propertyModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const User = require("../models/userModel");
+const cloudinary = require("../services/cloudinary");
 
 module.exports = {
   /**
@@ -10,6 +11,20 @@ module.exports = {
    * @method POST
    */
   createProperty: catchAsync(async (req, res, next) => {
+    const imagesPromises = req.files.map(async (file) => {
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
+        file.path,
+        null,
+        { folder: "Property" }
+      );
+      return {
+        original: secure_url,
+        thumbnail: secure_url,
+        publicId: public_id,
+      };
+    });
+    const images = await Promise.all(imagesPromises);
+
     const property = await Property.create({
       title: req.body.title,
       type: req.body.type,
@@ -26,6 +41,7 @@ module.exports = {
       specialFeatures: req.body.specialFeatures,
       furnished: req.body.furnished,
       newlyBuilt: req.body.newlyBuilt,
+      images: images,
       agent: req.user.id,
     });
 
@@ -115,6 +131,13 @@ module.exports = {
    * @method DELETE
    */
   deleteProperty: catchAsync(async (req, res, next) => {
+    const property = await Property.findOne({ _id: req.params.id });
+    const deletePromises = property.images.map(async (image) => {
+      await cloudinary.uploader.destroy(image.publicId, null, {
+        folder: "Property",
+      });
+    });
+    await Promise.all(deletePromises);
     await Property.findByIdAndDelete(req.params.id);
 
     res.status(204).json({

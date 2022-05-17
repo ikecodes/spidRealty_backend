@@ -27,9 +27,8 @@ module.exports = {
     if (req.file) {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
         req.file.path,
-        {
-          upload_preset: "agent",
-        }
+        null,
+        { folder: "CAC" }
       );
       companyCac = secure_url;
       companyCacPublicId = public_id;
@@ -54,23 +53,6 @@ module.exports = {
   }),
 
   /**
-   * @function login
-   * @route /api/v1/users/session
-   * @method POST
-   */
-  login: catchAsync(async (req, res, next) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return next(new AppError("please provide email and password!", 400));
-    }
-    const user = await User.findOne({ email }).select("+password");
-    if (!user || !(await user.correctPassword(password, user.password))) {
-      return next(new AppError("incorrect email or password!", 401));
-    }
-    createAndSendToken(user, 200, res);
-  }),
-
-  /**
    * @function sendEmail
    * @route /api/v1/users/sendEmail
    * @method POST
@@ -89,11 +71,23 @@ module.exports = {
       firtname: user.firstName,
       token: token,
     };
-    await Mail(options);
-    res.status(200).json({
-      status: "success",
-      message: "token sent to mail",
-    });
+    try {
+      await Mail(options);
+
+      res.status(200).json({
+        status: "success",
+        message: "token sent to mail",
+      });
+    } catch (error) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return next(
+        new AppError("There was an error sending the email. Try again later!"),
+        500
+      );
+    }
   }),
 
   /**
@@ -107,7 +101,7 @@ module.exports = {
       email: req.body.email,
     });
     if (!user) {
-      return next(new AppError("token is invalid", 400));
+      return next(new AppError("token is invalid or has expired", 400));
     }
     user.emailConfirmToken = undefined;
     await user.save();
@@ -115,6 +109,23 @@ module.exports = {
       status: "success",
       message: "Token confirmation successful, you can now login",
     });
+  }),
+
+  /**
+   * @function login
+   * @route /api/v1/users/session
+   * @method POST
+   */
+  login: catchAsync(async (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return next(new AppError("please provide email and password!", 400));
+    }
+    const user = await User.findOne({ email }).select("+password");
+    if (!user || !(await user.correctPassword(password, user.password))) {
+      return next(new AppError("incorrect email or password!", 401));
+    }
+    createAndSendToken(user, 200, res);
   }),
 
   /**
@@ -174,6 +185,7 @@ module.exports = {
       passwordResetToken: hashedPassword,
       passwordResetExpires: { $gt: Date.now() },
     });
+
     //2) set new password id token !expired and user still exists
     if (!user) {
       return next(new AppError("token is invalid or has expired", 400));
@@ -232,8 +244,9 @@ module.exports = {
 
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
+      null,
       {
-        upload_preset: "agent",
+        folder: "Profile",
       }
     );
 
@@ -285,8 +298,9 @@ module.exports = {
 
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
+      null,
       {
-        upload_preset: "agent",
+        folder: "ID",
       }
     );
 
