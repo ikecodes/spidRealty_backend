@@ -33,6 +33,7 @@ const propertySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    socialShare: [String],
     agent: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -45,6 +46,14 @@ const propertySchema = new mongoose.Schema(
 
 propertySchema.pre("save", function (next) {
   this.slug = slugify(this.title, { lower: true });
+
+  const spacedSlug = slugify(this.title, { replacement: "%20" });
+
+  const twitterShare = `https://twitter.com/intent/tweet?text=${spacedSlug}&url=https://www.spidrealty.com/blog/${this.slug}`;
+  const linkedinShare = `https://www.linkedin.com/sharing/share-offsite/?url=https://www.spidrealty.com/blog/${this.slug}`;
+  const facebookShare = `https://web.facebook.com/sharer.php?u=https://www.spidrealty.com/blog/${this.slug}`;
+
+  this.socialShare = [twitterShare, linkedinShare, facebookShare];
   next();
 });
 const Property = mongoose.model("Property", propertySchema);
