@@ -127,6 +127,20 @@ module.exports = {
     }
     createAndSendToken(user, 200, res);
   }),
+  /**
+   * @function me
+   * @route /api/v1/users/getMe
+   * @method POST
+   */
+  getMe: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({ id: req.user.id });
+    if (!user) return next(new AppError("Please login to gain access", 403));
+
+    res.status(200).json({
+      status: "success",
+      data: user,
+    });
+  }),
 
   /**
    * @function forgotPassword

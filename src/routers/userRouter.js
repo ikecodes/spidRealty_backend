@@ -16,6 +16,7 @@ router.route("/forgotPassword").post(AuthController.forgotPassword);
 router.route("/resetPassword/:token").patch(AuthController.resetPassword);
 
 router.use(auth);
+router.route("/me").get(AuthController.getMe);
 router
   .route("/uploadId")
   .patch(upload.single("identityCard"), AuthController.uploadId);
