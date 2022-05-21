@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    emailConfirmToken: String,
+    emailConfirmToken: Number,
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
