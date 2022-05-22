@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 module.exports = () => {
-  const localDb = process.env.LOCAL_DATABASE;
+  const localDb = process.env.REMOTE_DATABASE;
   mongoose
     .connect(localDb, {
       useNewUrlParser: true,
