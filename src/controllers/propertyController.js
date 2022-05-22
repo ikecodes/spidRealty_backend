@@ -35,7 +35,7 @@ module.exports = {
       size: req.body.size,
       state: req.body.state,
       town: req.body.town,
-      address: req.body.address,
+      location: req.body.location,
       price: req.body.price,
       description: req.body.description,
       specialFeatures: req.body.specialFeatures,
