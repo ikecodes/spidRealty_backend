@@ -25,6 +25,7 @@ app.use(xss());
 app.use(cors());
 app.use(mongoSanitize());
 
+// home
 app.use("/", (req, res) => {
   res.send("Welcome to Spid Realty server 😄");
 });
