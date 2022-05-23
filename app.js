@@ -25,13 +25,17 @@ app.use(xss());
 app.use(cors());
 app.use(mongoSanitize());
 
-// home
-app.use("/", (req, res) => {
-  res.send("Welcome to Spid Realty server 😄");
-});
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/articles", articleRouter);
+
+// home
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: true,
+    message: "Welcome to Spid Realty App",
+  });
+});
 
 app.use(errorHandler);
 
