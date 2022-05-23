@@ -25,6 +25,9 @@ app.use(xss());
 app.use(cors());
 app.use(mongoSanitize());
 
+app.use("/", (req, res) => {
+  res.send("Welcome to Spid Realty server 😄");
+});
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/articles", articleRouter);
