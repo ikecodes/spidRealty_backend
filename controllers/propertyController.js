@@ -34,7 +34,7 @@ module.exports = {
       toilets: req.body.toilets,
       size: req.body.size,
       state: req.body.state,
-      town: req.body.town,
+      region: req.body.region,
       location: req.body.location,
       price: req.body.price,
       description: req.body.description,
@@ -62,6 +62,21 @@ module.exports = {
    */
   getAllProperty: catchAsync(async (req, res, next) => {
     const properties = await Property.find({ isVerified: { $ne: false } });
+
+    res.status(200).json({
+      status: "success",
+      data: properties,
+    });
+  }),
+  /**
+   * @function getAllPropertyByUser
+   * @route /api/v1/properties/getAllPropertyByUser
+   * @method GET
+   */
+  getAllPropertyByUser: catchAsync(async (req, res, next) => {
+    const properties = await Property.find({
+      agent: req.user._id,
+    });
 
     res.status(200).json({
       status: "success",

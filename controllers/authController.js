@@ -122,9 +122,9 @@ module.exports = {
       return next(new AppError("please provide email and password!", 400));
     }
     const user = await User.findOne({ email }).select("+password");
-    if (!user || !(await user.correctPassword(password, user.password))) {
+    if (!user || !(await user.correctPassword(password, user.password)))
       return next(new AppError("incorrect email or password!", 401));
-    }
+
     createAndSendToken(user, 200, res);
   }),
   /**
@@ -255,7 +255,6 @@ module.exports = {
     }
     if (req.user.photoPublicId)
       await cloudinary.uploader.destroy(req.user.photoPublicId);
-
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
       null,

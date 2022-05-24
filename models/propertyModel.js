@@ -11,7 +11,7 @@ const propertySchema = new mongoose.Schema(
     toilets: Number,
     size: Number,
     state: String,
-    town: String,
+    region: String,
     location: String,
     price: Number,
     description: String,

@@ -11,6 +11,9 @@ router
   .route("/")
   .get(PropertyController.getAllProperty)
   .post(upload.array("images"), PropertyController.createProperty);
+router
+  .route("/getAllPropertyByUser")
+  .get(PropertyController.getAllPropertyByUser);
 router.route("/:id").get(PropertyController.getProperty);
 router.route("/:id").delete(PropertyController.deleteProperty);
 
