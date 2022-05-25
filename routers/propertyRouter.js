@@ -5,11 +5,11 @@ const PropertyController = require("../controllers/propertyController");
 const upload = require("../services/multer");
 const router = Router();
 
-router.use(auth);
+router.route("/").get(PropertyController.getAllProperty);
 
+router.use(auth);
 router
   .route("/")
-  .get(PropertyController.getAllProperty)
   .post(upload.array("images"), PropertyController.createProperty);
 router
   .route("/getAllPropertyByUser")
