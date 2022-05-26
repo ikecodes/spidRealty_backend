@@ -156,9 +156,7 @@ module.exports = {
     const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/api/v1/resetPassword/${resetToken}`;
+    const resetUrl = `https://www.spidrealty.com/reset-password?${resetToken}`;
 
     const options = {
       mail: user.email,

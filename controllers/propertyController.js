@@ -77,7 +77,6 @@ module.exports = {
     const properties = await Property.find({
       agent: req.user._id,
     });
-
     res.status(200).json({
       status: "success",
       data: properties,
