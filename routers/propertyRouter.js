@@ -6,6 +6,7 @@ const upload = require("../services/multer");
 const router = Router();
 
 router.route("/").get(PropertyController.getAllProperty);
+router.route("/:id").get(PropertyController.getProperty);
 
 router.use(auth);
 router
@@ -14,7 +15,6 @@ router
 router
   .route("/getAllPropertyByUser")
   .get(PropertyController.getAllPropertyByUser);
-router.route("/:id").get(PropertyController.getProperty);
 router.route("/:id").delete(PropertyController.deleteProperty);
 
 router.use(role("admin"));

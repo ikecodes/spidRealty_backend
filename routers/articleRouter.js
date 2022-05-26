@@ -6,11 +6,12 @@ const upload = require("../services/multer");
 
 const router = Router();
 
+router.route("/").get(ArticleController.getAllArticle);
+router.route("/:id").get(ArticleController.getArticle);
+
 router.use(auth);
 router.use(role("admin"));
 router.route("/").post(upload.single("photo"), ArticleController.createArticle);
 
-router.route("/").get(ArticleController.getAllArticle);
-router.route("/:id").get(ArticleController.getArticle);
 router.route("/:id").delete(ArticleController.deleteArticle);
 module.exports = router;
