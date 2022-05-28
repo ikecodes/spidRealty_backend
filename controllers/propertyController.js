@@ -1,6 +1,7 @@
 const Property = require("../models/propertyModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
+const APIFeatures = require("../helpers/apiFeatures");
 const User = require("../models/userModel");
 const cloudinary = require("../services/cloudinary");
 
@@ -61,11 +62,22 @@ module.exports = {
    * @method GET
    */
   getAllProperty: catchAsync(async (req, res, next) => {
-    const properties = await Property.find({ isVerified: { $ne: false } });
+    const properties = new APIFeatures(
+      Property.find({ isVerified: { $ne: false } }),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
+    // properties = properties.find({ isVerified: { $ne: false } });
+    const doc = await properties.query;
+
+    // return console.log(doc);
     res.status(200).json({
       status: "success",
-      data: properties,
+      data: doc,
     });
   }),
   /**
