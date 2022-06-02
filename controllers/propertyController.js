@@ -61,7 +61,8 @@ module.exports = {
    * @route /api/v1/properties
    * @method GET
    */
-  getAllProperty: catchAsync(async (req, res, next) => {
+  getAllPropertyxx: catchAsync(async (req, res, next) => {
+    console.log(req.query);
     const properties = new APIFeatures(
       Property.find({ isVerified: { $ne: false } }),
       req.query
@@ -77,6 +78,41 @@ module.exports = {
     // return console.log(doc);
     res.status(200).json({
       status: "success",
+      data: doc,
+    });
+  }),
+  /**
+   * @function getAllProperty
+   * @route /api/v1/properties
+   * @method GET
+   */
+  getAllProperty: catchAsync(async (req, res, next) => {
+    const properties = new APIFeatures(
+      Property.find({ isVerified: { $ne: false } }),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    let queryObj = { ...req.query };
+    const excludedFields = ["page", "sort", "limit", "fields"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    const countPromise = Property.countDocuments(queryObj); // get total number of document matching query
+    const docPromise = properties.query;
+
+    const [count, doc] = await Promise.all([countPromise, docPromise]);
+
+    const pageCount = Math.ceil(count / 10);
+    // return console.log(doc);
+    res.status(200).json({
+      status: "success",
+      pagination: {
+        count,
+        pageCount,
+      },
       data: doc,
     });
   }),
