@@ -3,11 +3,17 @@ const slugify = require("slugify");
 
 const articleSchema = new mongoose.Schema(
   {
-    title: String,
     slug: String,
+    title: String,
+    author: String,
     description: String,
+    body: String,
     photo: String,
     photoPublicId: String,
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     socialShare: [String],
   },
   { timestamps: true }

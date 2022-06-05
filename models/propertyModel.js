@@ -36,6 +36,10 @@ const propertySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isPromoted: {
+      type: Boolean,
+      default: false,
+    },
     socialShare: [String],
     agent: {
       type: mongoose.Schema.ObjectId,

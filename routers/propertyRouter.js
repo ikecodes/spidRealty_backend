@@ -18,6 +18,9 @@ router
 router.route("/:id").delete(PropertyController.deleteProperty);
 
 router.use(role("admin"));
+router
+  .route("/admin/getAllPropertyByAdmin")
+  .get(PropertyController.getAllPropertyByAdmin);
 router.route("/verifyProperty/:id").patch(PropertyController.verifyProperty);
 router.route("/markAsSold/:id").patch(PropertyController.markAsSold);
 module.exports = router;

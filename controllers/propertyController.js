@@ -82,6 +82,20 @@ module.exports = {
     });
   }),
   /**
+   * @function getAllPropertyAdmin
+   * @route /api/v1/properties/admin
+   * @method GET
+   */
+  getAllPropertyByAdmin: catchAsync(async (req, res, next) => {
+    const properties = await Property.find();
+
+    // return console.log(doc);
+    res.status(200).json({
+      status: "success",
+      data: properties,
+    });
+  }),
+  /**
    * @function getAllProperty
    * @route /api/v1/properties
    * @method GET
