@@ -18,7 +18,9 @@ module.exports = {
 
     const article = await Article.create({
       title: req.body.title,
+      author: req.body.author,
       description: req.body.description,
+      body: req.body.body,
       photo: secure_url,
       photoPublicId: public_id,
     });
@@ -51,6 +53,23 @@ module.exports = {
 
     if (!article)
       return next(new AppError("No article with this id found", 404));
+    res.status(200).json({
+      status: "success",
+      data: article,
+    });
+  }),
+  /**
+   * @function updateArticle
+   * @route /api/v1/articles
+   * @method PATCH
+   */
+  updateArticle: catchAsync(async (req, res, next) => {
+    const article = await Article.findByIdAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true }
+    );
+
     res.status(200).json({
       status: "success",
       data: article,

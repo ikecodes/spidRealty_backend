@@ -13,5 +13,6 @@ router.use(auth);
 router.use(role("admin"));
 router.route("/").post(upload.single("photo"), ArticleController.createArticle);
 
+router.route("/:id").patch(ArticleController.updateArticle);
 router.route("/:id").delete(ArticleController.deleteArticle);
 module.exports = router;
