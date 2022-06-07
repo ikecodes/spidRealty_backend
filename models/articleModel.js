@@ -8,6 +8,12 @@ const articleSchema = new mongoose.Schema(
     author: String,
     description: String,
     body: String,
+    readingTime: {
+      text: String,
+      minutes: Number,
+      time: Number,
+      words: Number,
+    },
     photo: String,
     photoPublicId: String,
     isFeatured: {

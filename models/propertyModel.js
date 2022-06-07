@@ -28,6 +28,10 @@ const propertySchema = new mongoose.Schema(
         thumbnail: String,
       },
     ],
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     isVerified: {
       type: Boolean,
       default: false,

@@ -2,6 +2,7 @@ const Article = require("../models/articleModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const cloudinary = require("../services/cloudinary");
+const readingTime = require("reading-time");
 
 module.exports = {
   /**
@@ -16,11 +17,13 @@ module.exports = {
       { folder: "Article" }
     );
 
+    const stats = readingTime(req.body.body);
     const article = await Article.create({
       title: req.body.title,
       author: req.body.author,
       description: req.body.description,
       body: req.body.body,
+      readingTime: stats,
       photo: secure_url,
       photoPublicId: public_id,
     });
