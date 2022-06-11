@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 const User = require("../models/userModel");
+const Article = require("../models/articleModel");
+const Property = require("../models/propertyModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const createAndSendToken = require("../helpers/createAndSendToken");
@@ -7,6 +9,31 @@ const Mail = require("../helpers/sendEmail");
 const cloudinary = require("../services/cloudinary");
 
 module.exports = {
+  /**
+   * @function getStats
+   * @route /api/v1/users/getStats
+   * @method GET
+   */
+  getStats: catchAsync(async (req, res, next) => {
+    const userPromise = User.countDocuments();
+    const propertyPromise = Property.countDocuments();
+    const articlePromise = Article.countDocuments();
+
+    const [totalUsers, totalProperties, totalArticles] = await Promise.all([
+      userPromise,
+      propertyPromise,
+      articlePromise,
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        totalUsers,
+        totalProperties,
+        totalArticles,
+      },
+    });
+  }),
   /**
    * @function getAllUsers
    * @route /api/v1/users
@@ -37,7 +64,6 @@ module.exports = {
    * @route /api/v1/users/verifyUser
    * @method PATCH
    */
-
   verifyUser: catchAsync(async (req, res, next) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,

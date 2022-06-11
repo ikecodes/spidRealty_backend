@@ -27,6 +27,7 @@ router
 router.route("/updatePassword").patch(AuthController.updatePassword);
 
 router.use(role("admin"));
+router.route("/getStats").get(UserController.getStats);
 router.route("/").get(UserController.getAllUsers);
 router.route("/:id").get(UserController.getUser);
 router.route("/verifyUser/:id").patch(UserController.verifyUser);
