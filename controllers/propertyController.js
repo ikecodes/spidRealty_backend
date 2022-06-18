@@ -207,7 +207,10 @@ module.exports = {
    * @method DELETE
    */
   deleteProperty: catchAsync(async (req, res, next) => {
-    const property = await Property.findOne({ _id: req.params.id });
+    const property = await Property.findOne({
+      agent: req.user._id,
+      _id: req.params.id,
+    });
     const deletePromises = property.images.map(async (image) => {
       await cloudinary.uploader.destroy(image.publicId, null, {
         folder: "Property",

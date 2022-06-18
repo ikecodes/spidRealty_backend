@@ -21,6 +21,7 @@ const articleSchema = new mongoose.Schema(
       default: false,
     },
     socialShare: [String],
+    shareUrl: String,
   },
   { timestamps: true }
 );
@@ -28,13 +29,16 @@ const articleSchema = new mongoose.Schema(
 articleSchema.pre("save", function (next) {
   this.slug = slugify(this.title, { lower: true });
 
-  const spacedSlug = slugify(this.title, { replacement: "%20" });
+  // create shareUrl
+  this.shareUrl = `https://www.spidrealty.com/blog/${this.slug}`;
 
-  const twitterShare = `https://twitter.com/intent/tweet?text=${spacedSlug}&url=https://www.spidrealty.com/blog/${this.slug}`;
-  const linkedinShare = `https://www.linkedin.com/sharing/share-offsite/?url=https://www.spidrealty.com/blog/${this.slug}`;
-  const facebookShare = `https://web.facebook.com/sharer.php?u=https://www.spidrealty.com/blog/${this.slug}`;
+  // const spacedSlug = slugify(this.title, { replacement: "%20" });
 
-  this.socialShare = [twitterShare, linkedinShare, facebookShare];
+  // const twitterShare = `https://twitter.com/intent/tweet?text=${spacedSlug}&url=https://www.spidrealty.com/blog/${this.slug}`;
+  // const linkedinShare = `https://www.linkedin.com/sharing/share-offsite/?url=https://www.spidrealty.com/blog/${this.slug}`;
+  // const facebookShare = `https://web.facebook.com/sharer.php?u=https://www.spidrealty.com/blog/${this.slug}`;
+
+  // this.socialShare = [twitterShare, linkedinShare, facebookShare];
   next();
 });
 const Article = mongoose.model("Article", articleSchema);

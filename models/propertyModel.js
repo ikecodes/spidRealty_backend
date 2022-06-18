@@ -45,6 +45,7 @@ const propertySchema = new mongoose.Schema(
       default: false,
     },
     socialShare: [String],
+    shareUrl: String,
     agent: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -57,17 +58,18 @@ const propertySchema = new mongoose.Schema(
 
 propertySchema.pre("save", function (next) {
   this.slug = slugify(this.title, { lower: true });
+  // create shareUrl
+  this.shareUrl = `https://www.spidrealty.com/marketplace/${this.slug}`;
 
-  const spacedSlug = slugify(this.title, { replacement: "%20" });
+  // const spacedSlug = slugify(this.title, { replacement: "%20" });
+  // const twitterShare = `https://twitter.com/intent/tweet?text=${spacedSlug}&url=https://www.spidrealty.com/marketplace/${this.slug}`;
+  // const linkedinShare = `https://www.linkedin.com/sharing/share-offsite/?url=https://www.spidrealty.com/marketplace/${this.slug}`;
+  // const facebookShare = `https://web.facebook.com/sharer.php?u=https://www.spidrealty.com/marketplace/${this.slug}`;
+  // this.socialShare = [twitterShare, linkedinShare, facebookShare];
 
-  const twitterShare = `https://twitter.com/intent/tweet?text=${spacedSlug}&url=https://www.spidrealty.com/blog/${this.slug}`;
-  const linkedinShare = `https://www.linkedin.com/sharing/share-offsite/?url=https://www.spidrealty.com/blog/${this.slug}`;
-  const facebookShare = `https://web.facebook.com/sharer.php?u=https://www.spidrealty.com/blog/${this.slug}`;
-  this.socialShare = [twitterShare, linkedinShare, facebookShare];
-
-  this.stateSlug = slugify(this.state, { lower: true });
-  this.regionSlug = slugify(this.region, { lower: true });
-  this.categorySlug = slugify(this.category, { lower: true });
+  // this.stateSlug = slugify(this.state, { lower: true });
+  // this.regionSlug = slugify(this.region, { lower: true });
+  // this.categorySlug = slugify(this.category, { lower: true });
   next();
 });
 const Property = mongoose.model("Property", propertySchema);
