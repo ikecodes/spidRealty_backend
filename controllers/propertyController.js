@@ -165,6 +165,23 @@ module.exports = {
   }),
   /**
    * @function updateProperty
+   * @route /api/v1/properties
+   * @method PATCH
+   */
+  updateProperty: catchAsync(async (req, res, next) => {
+    const property = await Property.findByIdAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: property,
+    });
+  }),
+  /**
+   * @function updateProperty
    * @route /api/v1/properties/verifyProperty/:id
    * @method PATCH
    */
