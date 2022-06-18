@@ -110,7 +110,7 @@ module.exports = {
       .limitFields()
       .paginate();
 
-    let queryObj = { ...req.query };
+    let queryObj = { ...req.query, isVerified: { $ne: false } };
     const excludedFields = ["page", "sort", "limit", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
