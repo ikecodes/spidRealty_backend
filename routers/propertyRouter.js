@@ -9,9 +9,7 @@ router.route("/").get(PropertyController.getAllProperty);
 router
   .route("/getAllPropertyByUser")
   .get(auth, PropertyController.getAllPropertyByUser);
-router
-  .route("/getSimilarProperty")
-  .get(auth, PropertyController.getSimilarProperty);
+router.route("/getSimilarProperty").get(PropertyController.getSimilarProperty);
 router.route("/:id").get(PropertyController.getProperty);
 
 router.use(auth);
