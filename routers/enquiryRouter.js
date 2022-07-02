@@ -6,6 +6,7 @@ const router = Router();
 
 router.route("/").post(EnquiryController.createEnquiry);
 
+router.use(auth);
 router.use(role("admin"));
 router.route("/").get(EnquiryController.getEnquiries);
 router.route("/:id").delete(EnquiryController.deleteEnquiry);
