@@ -8,7 +8,10 @@ const router = Router();
 router.route("/").get(PropertyController.getAllProperty);
 router
   .route("/getAllPropertyByUser")
-  .get(auth, PropertyController.getAllPropertyByUser); // added auth middleware to this
+  .get(auth, PropertyController.getAllPropertyByUser);
+router
+  .route("/getSimilarProperty")
+  .get(auth, PropertyController.getSimilarProperty);
 router.route("/:id").get(PropertyController.getProperty);
 
 router.use(auth);

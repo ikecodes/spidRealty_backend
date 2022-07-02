@@ -8,6 +8,7 @@ const errorHandler = require("./middlewares/errorHandler");
 const userRouter = require("./routers/userRouter");
 const propertyRouter = require("./routers/propertyRouter");
 const articleRouter = require("./routers/articleRouter");
+const enquiryRouter = require("./routers/enquiryRouter");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(mongoSanitize());
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/articles", articleRouter);
+app.use("/api/v1/enquiries", enquiryRouter);
 
 // home
 app.get("/", (req, res) => {

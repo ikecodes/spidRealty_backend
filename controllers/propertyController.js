@@ -145,6 +145,18 @@ module.exports = {
     });
   }),
   /**
+   * @function getSimilarProperty
+   * @route /api/v1/properties/getSimilarProperty
+   * @method GET
+   */
+  getSimilarProperty: catchAsync(async (req, res, next) => {
+    const properties = await Property.find(req.query);
+    res.status(200).json({
+      status: "success",
+      data: properties,
+    });
+  }),
+  /**
    * @function getProperty
    * @route /api/v1/properties/:id
    * @method GET
