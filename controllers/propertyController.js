@@ -136,8 +136,12 @@ module.exports = {
    * @method GET
    */
   getAllRentalProperty: catchAsync(async (req, res, next) => {
+    req.query = {
+      ...req.query,
+      type: "Rent",
+    };
     const properties = new APIFeatures(
-      Property.find({ isVerified: { $ne: false }, type: "Rent" }),
+      Property.find({ isVerified: { $ne: false } }),
       req.query
     )
       .filter()
