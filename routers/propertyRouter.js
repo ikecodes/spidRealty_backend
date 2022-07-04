@@ -7,6 +7,9 @@ const router = Router();
 
 router.route("/").get(PropertyController.getAllProperty);
 router
+  .route("/getAllRentalProperty")
+  .get(PropertyController.getAllRentalProperty);
+router
   .route("/getAllPropertyByUser")
   .get(auth, PropertyController.getAllPropertyByUser);
 router.route("/getSimilarProperty").get(PropertyController.getSimilarProperty);

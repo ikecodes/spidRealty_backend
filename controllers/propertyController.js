@@ -131,6 +131,40 @@ module.exports = {
     });
   }),
   /**
+   * @function getAllRentalProperty
+   * @route /api/v1/properties/getAllRentalProperty
+   * @method GET
+   */
+  getAllRentalProperty: catchAsync(async (req, res, next) => {
+    const properties = new APIFeatures(
+      Property.find({ isVerified: { $ne: false }, type: "Rent" }),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    let queryObj = { ...req.query, isVerified: { $ne: false } };
+    const excludedFields = ["page", "sort", "limit", "fields"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    const countPromise = Property.countDocuments(queryObj);
+    const docPromise = properties.query;
+
+    const [count, doc] = await Promise.all([countPromise, docPromise]);
+
+    const pageCount = Math.ceil(count / 10);
+    res.status(200).json({
+      status: "success",
+      pagination: {
+        count,
+        pageCount,
+      },
+      data: doc,
+    });
+  }),
+  /**
    * @function getAllPropertyByUser
    * @route /api/v1/properties/getAllPropertyByUser
    * @method GET
